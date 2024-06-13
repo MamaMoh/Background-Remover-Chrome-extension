@@ -1,21 +1,19 @@
-# Next.js Chrome Extension Starter  🚀  
-
-Next.js Chrome Extension Starter is a demo example application that demonstrates how to build a Chrome extension using Next.js.
+# Backrgound Remover Chrome Extension with Replicate API and Netx.js   🚀  
+Backrgound Remover Chrome Extension  is a  example application that demonstrates how to build a Chrome extension using Next.js, Replicate ApI.
 
 ## Table of Contents ✨  
 
 - [Description](#description)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 # Description
 
-The Next.js Chrome Extension Starter provides a foundation for building Chrome extensions using Next.js, React, and other related technologies. It showcases the integration of Next.js and Chrome extension development by demonstrating a simple application with multiple pages.
+Backrgound Remover Chrome Extension  is a  example application that demonstrates how to build a Chrome extension using Next.js, Replicate ApI.
 
 
-![Preview](Screen2.jpg)
+![Preview](image1.png)
 
 # Installation
 
@@ -69,8 +67,6 @@ npm run build
 ![Preview](image2.png)
 
 
-
-![Preview](image1.png)
 
 # License
 This project is licensed under the MIT License.
