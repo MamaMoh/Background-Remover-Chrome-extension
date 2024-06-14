@@ -47,14 +47,15 @@ const Index = ({ navigateToPage }) => {
     console.log("file to be sent:", apiToken);
     const start = Date.now();
     setTimeOfRequest(undefined);
+
     setLoading(true);
-    const response = await fetch("https://api.replicate.com/v1/predictions/api/remove", {
+
+    const response = await fetch("https://background-remover-chrome-extension.vercel.app/api/remove", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify({imageUrl }),
+      body: JSON.stringify({imageUrl ,apiToken}),
     });
     let result = await response.json();
     if (response.status !== 201) {
@@ -66,7 +67,7 @@ const Index = ({ navigateToPage }) => {
 
     while (result.status !== "succeeded" && result.status !== "failed") {
       // await sleep(1000);
-      const response = await fetch("https://background-remover-chrome-extension.vercel.app/api/remove/" + result.id);
+      const response = await fetch("https://background-remover-chrome-extension.vercel.app/api/remove/" + result.id+apiToken);
       result = await response.json();
       if (response.status !== 200) {
         setError(result.detail);

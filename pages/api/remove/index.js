@@ -3,10 +3,11 @@ export default async function handler(req, res) {
   console.log("req")
   console.log(req.query.apiToken);
   const image = req.body.imageUrl;
+  const apiToken = req.body.apiToken;
   const response = await fetch("https://api.replicate.com/v1/predictions", {
     method: "POST",
     headers: {
-      Authorization: `Token r8_U8kB5Dpqh1pztXL9ae6GTbhUolbWznK0URxyF`,
+      Authorization: `Token ${apiToken}`,
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
     },
