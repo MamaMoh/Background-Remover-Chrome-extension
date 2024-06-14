@@ -8,6 +8,7 @@ export default async function handler(req, res) {
     headers: {
       Authorization: `Token r8_U8kB5Dpqh1pztXL9ae6GTbhUolbWznK0URxyF`,
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
     },
     body: JSON.stringify({
       version: 'fb8af171cfa1616ddcf1242c093f9c46bcada5ad4cf6f2fbe8b81b330ec5c003',

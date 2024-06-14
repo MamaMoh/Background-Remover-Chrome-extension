@@ -7,6 +7,7 @@ export default async function handler(req, res) {
       headers: {
         Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
       mode:"no-cors",
     }
