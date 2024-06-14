@@ -1,6 +1,8 @@
 export default async function handler(req, res) {
   debugger;
-  const image = 'https://upcdn.io/W142hJk/thumbnail/demo/4kYgA3y43w.jpg';
+  console.log("req")
+  console.log(req.query.apiToken);
+  const image = req.body.imageUrl;
   const response = await fetch("https://api.replicate.com/v1/predictions", {
     method: "POST",
     headers: {

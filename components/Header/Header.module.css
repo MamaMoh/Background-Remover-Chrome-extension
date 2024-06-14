@@ -55,4 +55,12 @@
   .saveButton:hover {
     background-color: #518EFF;
   }
-  
+  .backButton {
+    background: none;
+    border: none;
+    color:  #ff5151;;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px 10px;
+    margin-left:300px;
+  }

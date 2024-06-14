@@ -8,6 +8,7 @@ export default async function handler(req, res) {
         Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
         "Content-Type": "application/json",
       },
+      mode:"no-cors",
     }
   );
   if (response.status !== 200) {
