@@ -48,7 +48,7 @@ const Index = ({ navigateToPage }) => {
     const start = Date.now();
     setTimeOfRequest(undefined);
     setLoading(true);
-    const response = await fetch("/api/remove", {
+    const response = await fetch("https://api.replicate.com/v1/predictions/api/remove", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
