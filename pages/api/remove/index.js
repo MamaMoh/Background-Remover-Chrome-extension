@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   debugger;
   console.log("req")
-  console.log(req.query.apiToken);
+  console.log(req.body.apiToken);
   const image = req.body.imageUrl;
   const apiToken = req.body.apiToken;
   const response = await fetch("https://api.replicate.com/v1/predictions", {
