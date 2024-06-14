@@ -47,10 +47,8 @@ const Index = ({ navigateToPage }) => {
     console.log("file to be sent:", apiToken);
     const start = Date.now();
     setTimeOfRequest(undefined);
-
     setLoading(true);
-
-    const response = await fetch("https://background-remover-chrome-extension.vercel.app/api/remove", {
+    const response = await fetch("/api/remove", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
