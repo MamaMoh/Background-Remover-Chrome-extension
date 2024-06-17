@@ -55,7 +55,7 @@ const Index = ({ navigateToPage }) => {
       imageUrl: imageUrl,
       // Assuming 'x' is your apiToken variable
     };
-    const response = await fetch("http://localhost:3002/api/remove", {
+    const response = await fetch("/api/remove", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -72,7 +72,7 @@ const Index = ({ navigateToPage }) => {
 
     while (result.status !== "succeeded" && result.status !== "failed") {
       // await sleep(1000);
-      const response = await fetch("http://localhost:3002/api/remove/" + result.id, {
+      const response = await fetch("/api/remove/" + result.id, {
         method: "POST", // Change to POST to send data in body
         headers: {
           "Content-Type": "application/json",

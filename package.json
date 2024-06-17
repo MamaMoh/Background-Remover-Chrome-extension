@@ -1,7 +1,7 @@
 {
-  "name": "next-chrome-starter",
+  "name": "BackgroundRemover",
   "version": "0.0.1",
-  "description": "Next.js Chrome Extension Starter, Demo Example by ibnzUK. https://github.com/ibnzUK/next-chrome-starter",
+  "description": "This is an extension developed by next.js using the replicate api to remove the Background of an image",
   "main": "index.js",
   "scripts": {
     "build": "npm run prep",
@@ -21,6 +21,7 @@
     "aos": "^2.3.4",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
+    "cors-anywhere": "^0.4.4",
     "glob": "^10.2.3",
     "next": "^13.4.1",
     "react": "^18.2.0",
