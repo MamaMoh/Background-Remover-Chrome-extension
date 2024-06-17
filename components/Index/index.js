@@ -49,13 +49,18 @@ const Index = ({ navigateToPage }) => {
     setTimeOfRequest(undefined);
 
     setLoading(true);
-
-    const response = await fetch("https://background-remover-chrome-extension.vercel.app/api/remove", {
+    setUploading(false);
+    const requestBody = {
+      apiToken: apiToken, 
+      imageUrl: imageUrl,
+      // Assuming 'x' is your apiToken variable
+    };
+    const response = await fetch("http://localhost:3002/api/remove", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({imageUrl ,apiToken}),
+      body: JSON.stringify({requestBody}),
     });
     let result = await response.json();
     if (response.status !== 201) {
@@ -67,7 +72,7 @@ const Index = ({ navigateToPage }) => {
 
     while (result.status !== "succeeded" && result.status !== "failed") {
       // await sleep(1000);
-      const response = await fetch("https://background-remover-chrome-extension.vercel.app/api/remove/" + result.id+apiToken);
+      const response = await fetch("http://localhost:3002/api/remove/" + result.id+apiToken);
       result = await response.json();
       if (response.status !== 200) {
         setError(result.detail);
@@ -143,9 +148,9 @@ const Index = ({ navigateToPage }) => {
             </button>
           )}
         </UploadButton>
-
-    
-        {error && <p className={styles.error}>{error}</p>}
+  {/* Loading indicator */}
+  {loading && <div className={styles.loading}>Loading...</div>}
+  {error && <div className={styles.error}>{error}</div>}
         
    {/* Rate Us Section */}
    {showRatingWidget && (
