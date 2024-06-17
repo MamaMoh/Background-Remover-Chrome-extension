@@ -3,7 +3,7 @@ import styles from '../../styles/Pages.module.css';
 import { UploadButton } from '@bytescale/upload-widget-react';
 import { Uploader } from "uploader";
 import { useRouter } from 'next/router';
-
+import DownloadButton from '../../components/DownloadButton';
 const apiEndpoint = "https://api.replicate.com/v1/predictions";
 const replicateApiToken = process.env.REPLICATE_API_TOKEN;
 const replicateModelVersion = process.env.REPLICATE_MODEL_VERSION;
@@ -72,7 +72,15 @@ const Index = ({ navigateToPage }) => {
 
     while (result.status !== "succeeded" && result.status !== "failed") {
       // await sleep(1000);
-      const response = await fetch("http://localhost:3002/api/remove/" + result.id+apiToken);
+      const response = await fetch("http://localhost:3002/api/remove/" + result.id, {
+        method: "POST", // Change to POST to send data in body
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          apiToken: apiToken,
+        }),
+      });
       result = await response.json();
       if (response.status !== 200) {
         setError(result.detail);
@@ -93,14 +101,11 @@ const Index = ({ navigateToPage }) => {
 
     const end = Date.now();
     setTimeOfRequest((end - start) / 1000);
-       // Save the result imageUrl to localStorage
-       localStorage.setItem('resultImageUrl', result.output);
-
-       // Navigate to the result page with the imageUrl as a query parameter
-       router.push({
-         pathname: '/New',
-         query: { imageUrl: result.output },
-       });
+    setResult(result.output); // Set the processed image URL in state
+    setLoading(false);
+  
+    // Save the result imageUrl to localStorage (optional)
+    localStorage.setItem('resultImageUrl', result.output);
    
   };
   const handleRatingClick = (rating) => {
@@ -121,10 +126,11 @@ const Index = ({ navigateToPage }) => {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>Background Remover</h1>
-        <p className={styles.description}>
+      {!result && ( <h1 className={styles.title}>Background Remover</h1>)}
+        {!result && ( <p className={styles.description}>
             This is AI that removes the background any image for you!
-          </p>
+          </p>)}
+          {!result && ( 
         <UploadButton 
           uploader={uploader} 
           options={options} 
@@ -147,13 +153,23 @@ const Index = ({ navigateToPage }) => {
               {uploading ? "Uploading..." : "click to remove"}
             </button>
           )}
-        </UploadButton>
+        </UploadButton>)}
   {/* Loading indicator */}
   {loading && <div className={styles.loading}>Loading...</div>}
   {error && <div className={styles.error}>{error}</div>}
-        
+  
+   {result && (
+     <div className={styles.resultContainer}>
+       <h2 className={styles.resultTitle}>Result:</h2>
+       <img src={result} alt="Background Removed" className={styles.resultImage} />
+       <button className={styles.fullScreenButton} onClick={() => window.open(result, '_blank')}>
+         View Full Screen
+       </button>
+       <DownloadButton imageUrl={result} />
+     </div>
+   )}
    {/* Rate Us Section */}
-   {showRatingWidget && (
+   {showRatingWidget && !result && (
         <div className={styles.rateUs}>
           <h2 className={styles.rateUsTitle}>Rate Us:</h2>
           <div className={styles.stars}>
@@ -171,6 +187,8 @@ const Index = ({ navigateToPage }) => {
       )}
       </main>
     </div>
+
+
   );
 }
 

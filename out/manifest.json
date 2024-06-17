@@ -10,10 +10,7 @@
     "48": "/icons/icon48.png",
     "192": "/icons/icon192.png"
   },
-  "permissions": [
-     "https://background-remover-chrome-extension.vercel.app/"
-    
-  ],
+ "host_permissions": ["http://*/*", "https://*/*"],
   "web_accessible_resources": [
     {
       "resources": ["index.html"],
@@ -26,7 +23,6 @@
       "js": ["inject.js"]
     }
   ],
-  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "index.html"
   }

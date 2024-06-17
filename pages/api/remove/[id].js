@@ -1,11 +1,10 @@
 export default async function handler(req, res) {
    // Log the request body to console
-
   const response = await fetch(
     "https://api.replicate.com/v1/predictions/" + req.query.id,
     {
       headers: {
-        Authorization: `Token ${req.query.apiToken}`,
+        Authorization: `Bearer ${req.body.apiToken}`,
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
