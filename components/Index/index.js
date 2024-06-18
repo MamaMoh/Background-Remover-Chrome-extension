@@ -55,12 +55,13 @@ const Index = ({ navigateToPage }) => {
       imageUrl: imageUrl,
       // Assuming 'x' is your apiToken variable
     };
-    const response = await fetch("api/remove", {
+    const response = await fetch("/api/remove", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({requestBody}),
+      body: JSON.stringify({ apiToken: apiToken, 
+        imageUrl: imageUrl,}),
     });
     let result = await response.json();
     if (response.status !== 201) {
@@ -72,7 +73,7 @@ const Index = ({ navigateToPage }) => {
 
     while (result.status !== "succeeded" && result.status !== "failed") {
       // await sleep(1000);
-      const response = await fetch("api/remove/" + result.id, {
+      const response = await fetch("/api/remove/" + result.id, {
         method: "POST", // Change to POST to send data in body
         headers: {
           "Content-Type": "application/json",
