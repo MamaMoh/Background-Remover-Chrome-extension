@@ -17,7 +17,6 @@ export default function Header() {
 
   const handleTokenSave = () => {
     localStorage.setItem('apiToken', apiToken);
-    console.log("API Token saved:", apiToken);
     setShowTokenModal(false); // Close token modal after saving
   };
   return (

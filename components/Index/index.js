@@ -25,9 +25,15 @@ const Index = ({ navigateToPage }) => {
   const [apiToken, setApiToken] = useState('');
   const router = useRouter();
   useEffect(() => {
-    // Retrieve API token from localStorage
-    const token = localStorage.getItem('apiToken');
-    setApiToken(token);
+    // Function to retrieve API token from localStorage
+    const getTokenFromStorage = () => {
+      const token = localStorage.getItem('apiToken');
+      if (token) {
+        setApiToken(token); // Set the apiToken state if it exists in localStorage
+      }
+    };
+  
+    getTokenFromStorage(); // Call the function when component mounts
   
   }, []);
 
@@ -36,7 +42,7 @@ const Index = ({ navigateToPage }) => {
     setTimeOfRequest(undefined);
  
     setUploading(false);
-    
+    console.log(apiToken);
     const response = await fetch("https://mama-api.vercel.app/api/predictions/", {
       method: "POST",
       headers: {
