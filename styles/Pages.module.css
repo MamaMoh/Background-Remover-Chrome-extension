@@ -55,11 +55,20 @@
 
 .stars {
   margin-bottom: 20px; /* Example spacing below stars */
+  color: yellow;
 }
 
-.star {
-  font-size: 24px; /* Example larger font size for stars */
-  cursor: pointer; /* Pointer cursor for interactive elements */
+
+.stars .star {
+  font-size: 24px;
+  color: yellow; /* Default color */
+  cursor: pointer;
+  transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+.stars .star.active,
+.stars .star:hover ~ .star {
+  color: white; /* Change color of the hovered star and all preceding stars */
 }
 .uploadButton {
   display: inline-block;

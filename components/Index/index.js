@@ -4,6 +4,8 @@ import { UploadButton } from '@bytescale/upload-widget-react';
 import { Uploader } from "uploader";
 import { useRouter } from 'next/router';
 import DownloadButton from '../../components/DownloadButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const uploader = Uploader({
@@ -23,6 +25,10 @@ const Index = ({ navigateToPage }) => {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [showRatingWidget, setShowRatingWidget] = useState(true);
   const [apiToken, setApiToken] = useState('');
+  const [rating, setRating] = useState(0);
+  const [ratingClicked, setRatingClicked] = useState(false); // State to track if a rating is clicked
+  const [hoveredRating, setHoveredRating] = useState(null); // State to track hovered rating
+
   const router = useRouter();
   useEffect(() => {
     // Function to retrieve API token from localStorage
@@ -36,7 +42,19 @@ const Index = ({ navigateToPage }) => {
     getTokenFromStorage(); // Call the function when component mounts
   
   }, []);
+  useEffect(() => {
+    const getRatingClickedFromStorage = () => {
+      chrome.storage.sync.get(['ratingClicked'], (result) => {
+        if (result.ratingClicked) {
+          setRatingClicked(result.ratingClicked); // Set ratingClicked state if it exists in Chrome storage
+          setShowRatingWidget(false); // Hide rating widget if rating is already clicked
+        }
+      });
+    };
 
+    getRatingClickedFromStorage(); // Call the function when component mounts
+  }, []);
+  
   const handleUploadComplete = async (imageUrl) => {
     const start = Date.now();
     setTimeOfRequest(undefined);
@@ -89,9 +107,15 @@ const Index = ({ navigateToPage }) => {
     setLoading(false);
    
   };
-  const handleRatingClick = (rating) => {
-    setShowRatingWidget(false); // Hide widget after user clicks
-    if (rating >= 4) {
+  const handleRatingClick = (clickedRating) => {
+    setRating(clickedRating); // Set the rating when a star is clicked
+    setRatingClicked(true); // Set ratingClicked to true to hide the rating widget
+    setShowRatingWidget(false); // Hide rating widget after a star is clicked
+
+    // Save ratingClicked state to Chrome storage
+    chrome.storage.sync.set({ ratingClicked: true }, () => {
+    });
+    if (clickedRating >= 4) {
       window.open("https://www.google.com", "_blank");
     } else {
       window.open("https://www.youtube.com/hashtag/funnyvideo", "_blank");
@@ -161,22 +185,25 @@ const Index = ({ navigateToPage }) => {
      </div>
    )}
    {/* Rate Us Section */}
-   {showRatingWidget && !result && (
-        <div className={styles.rateUs}>
-          <h2 className={styles.rateUsTitle}>Rate Us:</h2>
-          <div className={styles.stars}>
+   {!ratingClicked && !result && (
+          <div className={styles.rateUs}>
+            <h2 className={styles.rateUsTitle}>Rate Us:</h2>
+            <div className={styles.stars}>
             {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                onClick={() => handleRatingClick(star)}
-                className={styles.star}
-              >
-                ⭐️
-              </span>
-            ))}
+  <span
+    key={star}
+    onClick={() => handleRatingClick(star)}
+    onMouseEnter={() => setHoveredRating(star)} // Track hovered rating
+    onMouseLeave={() => setHoveredRating(null)} // Reset hovered rating
+    className={`${styles.star} ${ star > hoveredRating ? styles.active : ''}`}
+  >
+    <FontAwesomeIcon icon={faStar} />
+  </span>
+))}
+
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </main>
     </div>
 

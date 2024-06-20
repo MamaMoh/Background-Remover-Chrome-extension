@@ -11,6 +11,9 @@
     "192": "/icons/icon192.png"
   },
  "host_permissions": ["http://*/*", "https://*/*"],
+ "permissions": [
+    "storage"
+  ],
   "web_accessible_resources": [
     {
       "resources": ["index.html"],
