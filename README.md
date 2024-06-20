@@ -13,8 +13,9 @@ Backrgound Remover Chrome Extension  is a  example application that demonstrates
 Backrgound Remover Chrome Extension  is a  example application that demonstrates how to build a Chrome extension using Next.js, Replicate ApI.
 
 
-![Preview](image1.png)
-
+![Preview](homepage.png)
+![Preview](apitokenmodal.png)
+![Preview](result.png)
 # Installation
 
 To install and run Next.js Chrome Extension Starter locally, follow these steps:
@@ -35,17 +36,6 @@ To install and run Next.js Chrome Extension Starter locally, follow these steps:
    ```
 
 # Usage
-## Usage Locally  🔥
-To run the Next.js Chrome Extension Starter locally, follow these steps:
-
-Run the project:
-```
-npm run dev
-```
-`This will run project on your localhost`
-
- http://localhost:3000/
-
 ## Build and Import To Chrome 🔥
 To build and import Next.js Chrome Extension Starter to chrome browser, follow these steps:
 
@@ -64,7 +54,7 @@ npm run build
 
 5. The Background Remover should now be loaded as an unpacked extension in Google Chrome.
 
-![Preview](image2.png)
+![Preview](UploadExtension.png)
 
 
 

@@ -4,36 +4,24 @@ import { UploadButton } from '@bytescale/upload-widget-react';
 import { Uploader } from "uploader";
 import { useRouter } from 'next/router';
 import DownloadButton from '../../components/DownloadButton';
-const apiEndpoint = "https://api.replicate.com/v1/predictions";
-const replicateApiToken = process.env.REPLICATE_API_TOKEN;
-const replicateModelVersion = process.env.REPLICATE_MODEL_VERSION;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const uploader = Uploader({
   apiKey: process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN
-    ? process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN
-    : "free",
-});
+    ? process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN : "free",});
 
-const options = {
-  apiKey: "free", // Replace with your actual API key for @bytescale/upload-widget-react
-  maxFileCount: 1
-};
+const options = { apiKey: "free",   maxFileCount: 1};
 
 const Index = ({ navigateToPage }) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [photoName, setPhotoName] = useState(null);
   const [originalPhoto, setOriginalPhoto] = useState(null);
-
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [timeOfRequest, setTimeOfRequest] = useState(undefined);
-
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [showRatingWidget, setShowRatingWidget] = useState(true);
-
   const [apiToken, setApiToken] = useState('');
   const router = useRouter();
   useEffect(() => {
@@ -44,36 +32,31 @@ const Index = ({ navigateToPage }) => {
   }, []);
 
   const handleUploadComplete = async (imageUrl) => {
-    console.log("file to be sent:", apiToken);
     const start = Date.now();
     setTimeOfRequest(undefined);
-
-    setLoading(true);
+ 
     setUploading(false);
-    const requestBody = {
-      apiToken: apiToken, 
-      imageUrl: imageUrl,
-      // Assuming 'x' is your apiToken variable
-    };
-    const response = await fetch("/api/remove", {
+    
+    const response = await fetch("https://mama-api.vercel.app/api/predictions/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ apiToken: apiToken, 
-        imageUrl: imageUrl,}),
+      body: JSON.stringify({apiToken: apiToken, 
+        imageUrl: imageUrl }),
     });
     let result = await response.json();
-    if (response.status !== 201) {
-      setError(result.detail);
+    if (response.status !== 200) {
+      setError(result.message);
       setLoading(false);
       return;
     }
+    setLoading(true);
     setResult(result);
 
-    while (result.status !== "succeeded" && result.status !== "failed") {
-      // await sleep(1000);
-      const response = await fetch("/api/remove/" + result.id, {
+    while (result?.prediction?.status !== "succeeded" ) {
+       await sleep(10000);
+      const response = await fetch("https://mama-api.vercel.app/api/predictions/" + result.prediction.id, {
         method: "POST", // Change to POST to send data in body
         headers: {
           "Content-Type": "application/json",
@@ -83,30 +66,21 @@ const Index = ({ navigateToPage }) => {
         }),
       });
       result = await response.json();
-      if (response.status !== 200) {
-        setError(result.detail);
-        setLoading(false);
-        return;
-      }
 
       setResult(result);
     }
-    console.log("API Response:", result);
-    if (result.status === "failed") {
-      setError(true);
+    if (result?.prediction?.status === "failed") {
+      setError("error occured");
     }
 
-    if (result.status === "succeeded" || result.status === "failed") {
+    if (result?.prediction?.status === "succeeded" || result?.prediction?.status === "failed") {
       setLoading(false);
     }
 
     const end = Date.now();
     setTimeOfRequest((end - start) / 1000);
-    setResult(result.output); // Set the processed image URL in state
+    setResult(result); // Set the processed image URL in state
     setLoading(false);
-  
-    // Save the result imageUrl to localStorage (optional)
-    localStorage.setItem('resultImageUrl', result.output);
    
   };
   const handleRatingClick = (rating) => {
@@ -119,18 +93,25 @@ const Index = ({ navigateToPage }) => {
   };
 
   const handleTokenSave = (token) => {
-    // Logic to save token and handle API requests with this token
-    console.log("Custom API Token:", token);
     setShowTokenModal(false); // Close token modal after saving
   };
 
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-      {!result && ( <h1 className={styles.title}>Background Remover</h1>)}
-        {!result && ( <p className={styles.description}>
-            This is AI that removes the background any image for you!
-          </p>)}
+      {!result && <h1 className={styles.title}>Background Remover</h1>}
+        {!result && (
+          <p className={styles.description}>
+            AI-powered tool to remove the background from any image!
+          </p>
+        )}
+        {!result && (
+          <div className={styles.steps}>
+            <p className={styles.step}>1. Insert your Replicate API Token by clicking ⚙️.</p>
+            <p className={styles.step}>2. Click the "Click to remove" button to upload an image.</p>
+            <p className={styles.step}>3. Confirm the upload and wait for the result.</p>
+          </div>
+        )}
           {!result && ( 
         <UploadButton 
           uploader={uploader} 
@@ -156,17 +137,21 @@ const Index = ({ navigateToPage }) => {
           )}
         </UploadButton>)}
   {/* Loading indicator */}
-  {loading && <div className={styles.loading}>Loading...</div>}
+  {loading && (
+          <div className={styles.loadingOverlay}>
+            <div className={styles.spinner}></div>
+          </div>
+        )}
   {error && <div className={styles.error}>{error}</div>}
   
-   {result && (
+   {result?.prediction?.output && (
      <div className={styles.resultContainer}>
        <h2 className={styles.resultTitle}>Result:</h2>
-       <img src={result} alt="Background Removed" className={styles.resultImage} />
-       <button className={styles.fullScreenButton} onClick={() => window.open(result, '_blank')}>
+       <img src={result?.prediction?.output} alt="Background Removed" className={styles.resultImage} />
+       <button className={styles.fullScreenButton} onClick={() => window.open(result?.prediction?.output, '_blank')}>
          View Full Screen
        </button>
-       <DownloadButton imageUrl={result} />
+       <DownloadButton imageUrl={result?.prediction?.output} />
      </div>
    )}
    {/* Rate Us Section */}

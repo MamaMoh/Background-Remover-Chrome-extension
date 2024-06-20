@@ -6,7 +6,7 @@ export default function Footer() {
       <a
         href="#"
       >
-        Background Remover V.0.0.1
+        Background Remover V.1.0.0
         <span className={styles.logo}>
           <img
             src="icons/icon16.png"

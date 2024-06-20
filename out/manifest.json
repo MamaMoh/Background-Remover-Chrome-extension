@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Image Background Remover",
-  "short_name": "BKGRMV",
-  "version": "0.0.1",
+  "short_name": "BG Eraser",
+  "version": "1.0.0",
   "description": "This is an extension developed by next.js using the replicate api to remove the Background of an image",
   "icons": {
     "16": "/icons/icon16.png",

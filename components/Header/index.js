@@ -20,17 +20,6 @@ export default function Header() {
     console.log("API Token saved:", apiToken);
     setShowTokenModal(false); // Close token modal after saving
   };
-
-  const handleBackButtonClick = () => {
-    if (currentPath === '/') {
-      // Handle the "Close" action if on the first page
-      setShowTokenModal(false);
-    } else {
-      // Redirect to the first page if not on the first page
-      router.push('/');
-    }
-  };
-
   return (
     <>
       <div className={styles.header}>
@@ -42,9 +31,7 @@ export default function Header() {
         >
           ⚙️
         </span>
-        <button className={styles.backButton} onClick={handleBackButtonClick}>
-          {currentPath === '/' ? 'Close' : 'Back'}
-        </button>
+        
       </div>
 
       {/* Token Modal */}
