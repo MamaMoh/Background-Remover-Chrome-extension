@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import styles from '../../styles/Pages.module.css';
-import { UploadButton } from '@bytescale/upload-widget-react';
-import { Uploader } from "uploader";
-import { useRouter } from 'next/router';
+import { UploadDropzone } from '@bytescale/upload-widget-react';
+import { Uploader } from 'uploader';
 import DownloadButton from '../../components/DownloadButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const uploader = Uploader({
-  apiKey: process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN
-    ? process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN : "free",});
+  apiKey: process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN || 'free',
+});
 
-const options = { apiKey: "free",   maxFileCount: 1};
+const options = {
+  apiKey: 'free',
+  maxFileCount: 1,
+};
 
 const Index = ({ navigateToPage }) => {
   const [uploading, setUploading] = useState(false);
@@ -26,189 +29,174 @@ const Index = ({ navigateToPage }) => {
   const [showRatingWidget, setShowRatingWidget] = useState(true);
   const [apiToken, setApiToken] = useState('');
   const [rating, setRating] = useState(0);
-  const [ratingClicked, setRatingClicked] = useState(false); // State to track if a rating is clicked
-  const [hoveredRating, setHoveredRating] = useState(null); // State to track hovered rating
+  const [ratingClicked, setRatingClicked] = useState(false);
+  const [hoveredRating, setHoveredRating] = useState(null);
 
-  const router = useRouter();
   useEffect(() => {
-    // Function to retrieve API token from localStorage
     const getTokenFromStorage = () => {
       const token = localStorage.getItem('apiToken');
       if (token) {
-        setApiToken(token); // Set the apiToken state if it exists in localStorage
+        setApiToken(token);
       }
     };
-  
-    getTokenFromStorage(); // Call the function when component mounts
-  
+
+    getTokenFromStorage();
   }, []);
+
   useEffect(() => {
     const getRatingClickedFromStorage = () => {
       chrome.storage.sync.get(['ratingClicked'], (result) => {
         if (result.ratingClicked) {
-          setRatingClicked(result.ratingClicked); // Set ratingClicked state if it exists in Chrome storage
-          setShowRatingWidget(false); // Hide rating widget if rating is already clicked
+          setRatingClicked(result.ratingClicked);
+          setShowRatingWidget(false);
         }
       });
     };
 
-    getRatingClickedFromStorage(); // Call the function when component mounts
+    getRatingClickedFromStorage();
   }, []);
-  
+
   const handleUploadComplete = async (imageUrl) => {
     const start = Date.now();
     setTimeOfRequest(undefined);
- 
     setUploading(false);
-    console.log(apiToken);
-    const response = await fetch("https://mama-api.vercel.app/api/predictions/", {
-      method: "POST",
+
+    const response = await fetch('https://mama-api.vercel.app/api/predictions/', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({apiToken: apiToken, 
-        imageUrl: imageUrl }),
+      body: JSON.stringify({ apiToken: apiToken, imageUrl: imageUrl }),
     });
+
     let result = await response.json();
     if (response.status !== 200) {
       setError(result.message);
       setLoading(false);
       return;
     }
+
     setLoading(true);
     setResult(result);
 
-    while (result?.prediction?.status !== "succeeded" ) {
-       await sleep(10000);
-      const response = await fetch("https://mama-api.vercel.app/api/predictions/" + result.prediction.id, {
-        method: "POST", // Change to POST to send data in body
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          apiToken: apiToken,
-        }),
-      });
-      result = await response.json();
+    while (result?.prediction?.status !== 'succeeded') {
+      await sleep(10000);
 
+      const response = await fetch('https://mama-api.vercel.app/api/predictions/' + result.prediction.id, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apiToken: apiToken }),
+      });
+
+      result = await response.json();
       setResult(result);
     }
-    if (result?.prediction?.status === "failed") {
-      setError("error occured");
+
+    if (result?.prediction?.status === 'failed') {
+      setError('An error occurred');
     }
 
-    if (result?.prediction?.status === "succeeded" || result?.prediction?.status === "failed") {
+    if (result?.prediction?.status === 'succeeded' || result?.prediction?.status === 'failed') {
       setLoading(false);
     }
 
     const end = Date.now();
     setTimeOfRequest((end - start) / 1000);
-    setResult(result); // Set the processed image URL in state
+    setResult(result);
     setLoading(false);
-   
   };
+
   const handleRatingClick = (clickedRating) => {
-    setRating(clickedRating); // Set the rating when a star is clicked
-    setRatingClicked(true); // Set ratingClicked to true to hide the rating widget
-    setShowRatingWidget(false); // Hide rating widget after a star is clicked
+    setRating(clickedRating);
+    setRatingClicked(true);
+    setShowRatingWidget(false);
 
-    // Save ratingClicked state to Chrome storage
-    chrome.storage.sync.set({ ratingClicked: true }, () => {
-    });
+    chrome.storage.sync.set({ ratingClicked: true }, () => {});
+
     if (clickedRating >= 4) {
-      window.open("https://www.google.com", "_blank");
+      window.open('https://www.google.com', '_blank');
     } else {
-      window.open("https://www.youtube.com/hashtag/funnyvideo", "_blank");
+      window.open('https://www.youtube.com/hashtag/funnyvideo', '_blank');
     }
-  };
-
-  const handleTokenSave = (token) => {
-    setShowTokenModal(false); // Close token modal after saving
   };
 
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-      {!result && <h1 className={styles.title}>Background Remover</h1>}
+        {!result && <h1 className={styles.title}>Background Remover</h1>}
         {!result && (
-          <p className={styles.description}>
-            AI-powered tool to remove the background from any image!
-          </p>
+          <p className={styles.description}>AI-powered tool to remove the background from any image!</p>
         )}
         {!result && (
           <div className={styles.steps}>
             <p className={styles.step}>1. Insert your Replicate API Token by clicking ⚙️.</p>
-            <p className={styles.step}>2. Click the "Click to remove" button to upload an image.</p>
-            <p className={styles.step}>3. Confirm the upload and wait for the result.</p>
+            <p className={styles.step}>2. Confirm the upload and wait for the result.</p>
           </div>
         )}
-          {!result && ( 
-        <UploadButton 
-          uploader={uploader} 
-          options={options} 
-          onComplete={(file) => {
-            if (file.length !== 0) {
-              setPhotoName(file[0].originalFile.originalFileName);
-              setOriginalPhoto(
-                file[0].fileUrl.replace("raw", "thumbnail")
-              );
-              handleUploadComplete(file[0].fileUrl.replace("raw", "thumbnail"));
-            }
-          }}
-        >
-          {({ onClick }) => (
-            <button 
-              className={styles.uploadButton} 
-              onClick={onClick} 
-              disabled={uploading}
-            >
-              {uploading ? "Uploading..." : "click to remove"}
-            </button>
-          )}
-        </UploadButton>)}
-  {/* Loading indicator */}
-  {loading && (
+        {!result && (
+          <UploadDropzone
+            uploader={uploader}
+            options={options}
+            onUpdate={({ uploadedFiles }) => {
+              if (uploadedFiles.length > 0) {
+                const fileUrl = uploadedFiles[0].fileUrl.replace('raw', 'thumbnail');
+                setPhotoName(uploadedFiles[0].originalFile.originalFileName);
+                setOriginalPhoto(fileUrl);
+                handleUploadComplete(fileUrl);
+              }
+            }}
+            width="600px"
+            height="200px"
+          >
+            {({ onClick }) => (
+              <button className={styles.uploadButton} onClick={onClick} disabled={uploading}>
+                {uploading ? 'Uploading...' : 'Click to remove'}
+              </button>
+            )}
+          </UploadDropzone>
+        )}
+        {loading && (
           <div className={styles.loadingOverlay}>
             <div className={styles.spinner}></div>
           </div>
         )}
-  {error && <div className={styles.error}>{error}</div>}
-  
-   {result?.prediction?.output && (
-     <div className={styles.resultContainer}>
-       <h2 className={styles.resultTitle}>Result:</h2>
-       <img src={result?.prediction?.output} alt="Background Removed" className={styles.resultImage} />
-       <button className={styles.fullScreenButton} onClick={() => window.open(result?.prediction?.output, '_blank')}>
-         View Full Screen
-       </button>
-       <DownloadButton imageUrl={result?.prediction?.output} />
-     </div>
-   )}
-   {/* Rate Us Section */}
-   {!ratingClicked && !result && (
+        {error && <div className={styles.error}>{error}</div>}
+        {result?.prediction?.output && (
+          <div className={styles.resultContainer}>
+            <h2 className={styles.resultTitle}>Result:</h2>
+            <img src={result?.prediction?.output} alt="Background Removed" className={styles.resultImage} />
+            <button
+              className={styles.fullScreenButton}
+              onClick={() => window.open(result?.prediction?.output, '_blank')}
+            >
+              View Full Screen
+            </button>
+            <DownloadButton imageUrl={result?.prediction?.output} />
+          </div>
+        )}
+        {!ratingClicked && !result && (
           <div className={styles.rateUs}>
             <h2 className={styles.rateUsTitle}>Rate Us:</h2>
             <div className={styles.stars}>
-            {[1, 2, 3, 4, 5].map((star) => (
-  <span
-    key={star}
-    onClick={() => handleRatingClick(star)}
-    onMouseEnter={() => setHoveredRating(star)} // Track hovered rating
-    onMouseLeave={() => setHoveredRating(null)} // Reset hovered rating
-    className={`${styles.star} ${ star > hoveredRating ? styles.active : ''}`}
-  >
-    <FontAwesomeIcon icon={faStar} />
-  </span>
-))}
-
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  onClick={() => handleRatingClick(star)}
+                  onMouseEnter={() => setHoveredRating(star)}
+                  onMouseLeave={() => setHoveredRating(null)}
+                  className={`${styles.star} ${star > (hoveredRating ) ? styles.active : ''}`}
+                >
+                  <FontAwesomeIcon icon={faStar} />
+                </span>
+              ))}
             </div>
           </div>
         )}
       </main>
     </div>
-
-
   );
-}
+};
 
 export default Index;

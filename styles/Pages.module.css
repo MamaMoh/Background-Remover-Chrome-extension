@@ -23,10 +23,12 @@
   align-items: center;
   text-align: center;
   font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 .steps {
   text-align: left;
-  margin: 20px 0;
+  margin: 5px 0;
   font-size: 14px;
 }
 
@@ -43,13 +45,13 @@
   font: small Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 }
 .rateUs {
-  margin-top: 50px; /* Example spacing between main content and rate us section */
+  margin-top: 10px; /* Example spacing between main content and rate us section */
   text-align: center; /* Center align the rate us section */
 
 }
 
 .rateUsTitle {
-  font-size: 24px; /* Example larger font size for rate us title */
+  font-size: 18px; /* Example larger font size for rate us title */
   margin-bottom: 10px; /* Example spacing between title and stars */
 }
 
@@ -60,7 +62,7 @@
 
 
 .stars .star {
-  font-size: 24px;
+  font-size: 18px;
   color: yellow; /* Default color */
   cursor: pointer;
   transition: color 0.3s ease; /* Smooth transition for color change */
