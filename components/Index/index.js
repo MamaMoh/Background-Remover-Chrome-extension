@@ -55,12 +55,14 @@ const Index = ({ navigateToPage }) => {
     setTimeOfRequest(undefined);
     setUploading(false);
 
+    const body = apiToken ? { apiToken: apiToken, imageUrl: imageUrl } : { imageUrl: imageUrl };
+
     const response = await fetch('https://mama-api.vercel.app/api/predictions/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ apiToken: apiToken, imageUrl: imageUrl }),
+      body: JSON.stringify(body),
     });
 
     let result = await response.json();
@@ -76,12 +78,14 @@ const Index = ({ navigateToPage }) => {
     while (result?.prediction?.status !== 'succeeded') {
       await sleep(10000);
 
+      const body = apiToken ? { apiToken: apiToken } : {};
+
       const response = await fetch('https://mama-api.vercel.app/api/predictions/' + result.prediction.id, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ apiToken: apiToken }),
+        body: JSON.stringify(body),
       });
 
       result = await response.json();
@@ -161,10 +165,17 @@ const Index = ({ navigateToPage }) => {
     chrome.storage.sync.set({ ratingClicked: true }, () => {});
 
     if (clickedRating >= 4) {
-      window.open('https://www.google.com', '_blank');
+      chrome.tabs.create({ url: 'https://www.google.com' });
     } else {
-      window.open('https://www.youtube.com/hashtag/funnyvideo', '_blank');
+      chrome.tabs.create({ url: 'https://www.youtube.com/hashtag/funnyvideo' });
     }
+  };
+
+  const handleUploadMore = () => {
+    setResult(null);
+    setPhotoName(null);
+    setOriginalPhoto(null);
+    setError(null);
   };
 
   return (
@@ -212,11 +223,28 @@ const Index = ({ navigateToPage }) => {
             <img src={result?.prediction?.output} alt="Background Removed" className={styles.resultImage} />
             <button
               className={styles.fullScreenButton}
-              onClick={() => window.open(result?.prediction?.output, '_blank')}
+              onClick={() => chrome.tabs.create({ url: result?.prediction?.output })}
             >
               View Full Screen
             </button>
             <DownloadButton imageUrl={result?.prediction?.output} />
+            <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onClick={() => fileInputRef.current.click()}
+          >
+            <button className={styles.uploadButton2} disabled={uploading}>
+              {uploading ? 'Uploading...' : 'Upload Image'}
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept="image/*"
+              onChange={(e) => handleFileUpload(e.target.files[0])}
+            />
+          </div>
+
           </div>
         )}
         {!ratingClicked && !result && (
