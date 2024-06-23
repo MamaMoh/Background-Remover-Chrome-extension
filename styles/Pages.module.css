@@ -118,6 +118,10 @@
   font-size: 16px;
   margin-top: 20px;
 }
+.error {
+  color: red;
+  font-weight: 100;
+}
 
 .fullScreenButton:hover {
   background-color: #518EFF;
@@ -168,3 +172,43 @@
   height: 60px;
   animation: spin 1s linear infinite;
 }
+
+.dropArea {
+  border: 2px dashed #ccc;
+  width: 90%;
+  height: 200px;
+  padding: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.dropArea:hover {
+  border-color: #007bff;
+}
+
+.uploadButton {
+  margin-top: 3rem;
+  margin-left: 5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #0070f3;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.uploadP {
+  margin-left: 1rem;
+  
+}
+.uploadButton:disabled {
+  background-color: #ccc;
+}
+
+.uploadButton:not(:disabled):hover {
+  background-color: #0051a3;
+}
+
+

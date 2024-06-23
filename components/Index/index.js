@@ -1,21 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from '../../styles/Pages.module.css';
-import { UploadDropzone } from '@bytescale/upload-widget-react';
-import { Uploader } from 'uploader';
 import DownloadButton from '../../components/DownloadButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const uploader = Uploader({
-  apiKey: process.env.NEXT_PUBLIC_UPLOAD_API_TOKEN || 'free',
-});
-
-const options = {
-  apiKey: 'free',
-  maxFileCount: 1,
-};
+const MAX_FILE_SIZE_MB = 64;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const Index = ({ navigateToPage }) => {
   const [uploading, setUploading] = useState(false);
@@ -31,6 +23,8 @@ const Index = ({ navigateToPage }) => {
   const [rating, setRating] = useState(0);
   const [ratingClicked, setRatingClicked] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(null);
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const getTokenFromStorage = () => {
@@ -108,6 +102,57 @@ const Index = ({ navigateToPage }) => {
     setLoading(false);
   };
 
+  const handleFileUpload = async (file) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Only image files are allowed.');
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB.`);
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('https://mama-api.vercel.app/api/image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.imageUrl) {
+        setPhotoName(file.name);
+        setOriginalPhoto(data.imageUrl);
+        handleUploadComplete(data.imageUrl);
+      } else {
+        setError('Failed to upload image.');
+        setUploading(false);
+      }
+    } catch (error) {
+      setError('Failed to upload image.');
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
   const handleRatingClick = (clickedRating) => {
     setRating(clickedRating);
     setRatingClicked(true);
@@ -132,30 +177,28 @@ const Index = ({ navigateToPage }) => {
         {!result && (
           <div className={styles.steps}>
             <p className={styles.step}>1. Insert your Replicate API Token by clicking ⚙️.</p>
-            <p className={styles.step}>2. Confirm the upload and wait for the result.</p>
+            <p className={styles.step}>2. Upload Image and wait for the result.</p>
           </div>
         )}
         {!result && (
-          <UploadDropzone
-            uploader={uploader}
-            options={options}
-            onUpdate={({ uploadedFiles }) => {
-              if (uploadedFiles.length > 0) {
-                const fileUrl = uploadedFiles[0].fileUrl.replace('raw', 'thumbnail');
-                setPhotoName(uploadedFiles[0].originalFile.originalFileName);
-                setOriginalPhoto(fileUrl);
-                handleUploadComplete(fileUrl);
-              }
-            }}
-            width="600px"
-            height="200px"
+          <div
+            className={styles.dropArea}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onClick={() => fileInputRef.current.click()}
           >
-            {({ onClick }) => (
-              <button className={styles.uploadButton} onClick={onClick} disabled={uploading}>
-                {uploading ? 'Uploading...' : 'Click to remove'}
-              </button>
-            )}
-          </UploadDropzone>
+            <button className={styles.uploadButton} disabled={uploading}>
+              {uploading ? 'Uploading...' : 'Upload Image'}
+            </button>
+            <p className={styles.uploadP}>Drag & drop an image here, or click to select one</p>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept="image/*"
+              onChange={(e) => handleFileUpload(e.target.files[0])}
+            />
+          </div>
         )}
         {loading && (
           <div className={styles.loadingOverlay}>
@@ -186,7 +229,7 @@ const Index = ({ navigateToPage }) => {
                   onClick={() => handleRatingClick(star)}
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(null)}
-                  className={`${styles.star} ${star > (hoveredRating ) ? styles.active : ''}`}
+                  className={`${styles.star} ${star > (hoveredRating) ? styles.active : ''}`}
                 >
                   <FontAwesomeIcon icon={faStar} />
                 </span>
